@@ -7,3 +7,4 @@ This progressive approach provides maximum preparation: not only do you learn th
 These mock tests are an independent **learning and practice tool** and are not affiliated with the Radio Society of Great Britain "RSGB" or any official examination body.
 **Content Difference (No Diagrams):** These mock tests are entirely text-based. The real official exams may contain **diagrams, images, or figures**; these practice tests intentionally do not replicate that visual content.
 The tests are designed to cover the syllabus but **do not exactly mirror** the specific wording or structure of any real-world official exam. Success here does not guarantee success on the official exam.
+https://rsgb-mock-exams.42web.io/?i=1
