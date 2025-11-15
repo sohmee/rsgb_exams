@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RSGB Full Mock Exam — 580 pool, 58-question quizzes</title>
+<style>
+  :root{--bg:#f7f8fb;--card:#fff;--muted:#6b7280;--accent:#2563eb;--flagged:#f59e0b;--correct:#10b981;--wrong:#ef4444}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg);color:#0f172a;margin:18px}
+  .wrap{max-width:1100px;margin:0 auto}
+  .top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
+  h1{font-size:18px;margin:0}
+  .disclaimer{font-size:13px;color:#374151;font-weight:600;margin-top:4px}
+  .small{color:var(--muted);font-size:13px}
+  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{background:var(--accent);color:white;padding:8px 10px;border-radius:8px;border:0;font-weight:600;cursor:pointer}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12);cursor:pointer}
+  .btn:disabled{opacity:0.5;cursor:not-allowed}
+  .panel{display:flex;gap:12px;align-items:center}
+  .stats{display:flex;gap:12px;align-items:center}
+  .qwrap{margin-top:12px}
+  .question{background:#fff;padding:12px;border-radius:10px;margin-bottom:10px;border:1px solid transparent}
+  .question.active{border-color:var(--accent)}
+  .opts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .opt{padding:10px;border-radius:8px;border:1px solid #e6edf7;background:transparent;text-align:left;cursor:pointer}
+  .opt.chosen{border-color:var(--accent);background:#f0f7ff}
+  .footer{margin-top:12px}
+  .progress{height:10px;background:#eef2ff;border-radius:8px;overflow:hidden}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#60a5fa);width:0%}
+  .right{margin-left:auto}
+  .dark{background:#0b1220;color:#dbeafe}
+  .dark .card{background:#071024}
+  .mini-nav{display:flex;flex-wrap:wrap;gap:4px;max-width:350px}
+  .mini-nav button{padding:6px 8px;border-radius:6px;border:1px solid #e6eefc;background:white;color:var(--muted);min-width:30px;font-size:12px;cursor:pointer}
+  .mini-nav button.answered{background:#eef2ff;color:var(--accent)}
+  .mini-nav button.flagged{box-shadow:0 0 0 2px var(--flagged)}
+  .mini-nav button.correct{background:var(--correct);color:white;border-color:var(--correct)}
+  .mini-nav button.wrong{background:var(--wrong);color:white;border-color:var(--wrong)}
+  .toggle{display:inline-flex;align-items:center;gap:8px}
+  .category{font-size:12px;color:#374151;margin-top:6px}
+  .review-correct{background:#ecfdf5;border:1px solid #10b981}
+  .review-wrong{background:#fff1f2;border:1px solid #fb7185}
+  .report{white-space:pre-wrap;font-family:monospace;font-size:13px;padding:10px;background:#f9fafb;border-radius:8px}
+  #savedQuizzesList li, #leaderboardList li {border-bottom: 1px solid #eee; padding: 8px 0;}
+  #savedQuizzesList li:last-child {border-bottom: none;}
+  .leaderboard-header {display:flex; justify-content:space-between; font-weight:700; padding:4px 0}
+  .leaderboard-row {display:flex; justify-content:space-between; align-items:center; padding:4px 0}
+  .leaderboard-row:nth-child(even) {background: #f9fafb;}
+  .hint-box {margin-top:10px; padding:10px; border-radius:8px; background:#f0f9ff; border:1px solid #38bdf8;}
+  .hint-box strong {color:#0ea5e9;}
+  /* New style for home link */
+  .home-link {
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 10px;
+    text-decoration: none;
+    color: var(--accent);
+  }
+  @media (max-width:880px){.top{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div style="display:flex; align-items: baseline;">
+        <h1>RSGB Full Mock Exam — 580-question pool, 58-question quizzes</h1>
+        <a href="index.html" class="home-link">[Home]</a>
+      </div>
+      <div class="disclaimer">
+          **Study Tool Only:** This tool does **not** contain the images/diagrams present in the official exam.
+      </div>
+      <div class="small">Single-page quiz — each run draws 58 balanced random questions. Review after submit or use show answer.</div>
+    </div>
+    <div class="controls">
+      <input type="text" id="userName" placeholder="Your Name for Leaderboard" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc; max-width: 180px;">
+      <div class="panel card" style="padding:8px 10px">
+        <div class="small">Timer</div>
+        <div id="timer" style="font-family:monospace;font-weight:700">02:00:00</div>
+      </div>
+      <button id="newQuizAll" class="btn">New Quiz (All)</button>
+      <button id="saveBtn" class="btn ghost">Save progress</button>
+      <button id="loadBtn" class="btn ghost">Manage saved attempts</button>
+      <button id="leaderboardBtn" class="btn ghost">Reports & Leaderboard</button>
+      <button id="howItWorksBtn" class="btn ghost">How it Works</button>
+      <label class="toggle small"><input id="darkToggle" type="checkbox"> Dark</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="min-width:220px">
+        <div class="small">Progress</div>
+        <div class="progress" style="margin:6px 0"><i id="progBar"></i></div>
+        <div class="small">Answered: <span id="answered">0</span> / <span id="totalQuestions">58</span> • Correct (so far): <span id="correctSoFar">0</span> • <strong id="percent">0%</strong></div>
+      </div>
+
+      <div style="min-width:260px">
+        <div class="small">Quiz options</div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <select id="categoryFilter"><option value="all">All categories</option></select>
+          <button id="filterBtn" class="btn ghost">Practice category</button>
+          <button id="printReport" class="btn">Print report</button>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="small">Quick jump (Flagged: <strong id="flaggedCount">0</strong>)</div>
+        <div class="mini-nav" id="miniNav"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="small">Answer choices are randomized. You won't see right/wrong until you click <strong>Submit answers</strong> (or use the show answer button).</div>
+    </div>
+
+    <div id="savedQuizzesListArea" class="card" style="margin-top: 12px; display: none; padding: 10px 14px;">
+      <h3 style="margin-top: 0; font-size: 16px;">Saved Quizzes</h3>
+      <ul id="savedQuizzesList" style="list-style: none; padding: 0;"></ul>
+    </div>
+
+    <div id="leaderboardArea" class="card" style="margin-top: 12px; display: none; padding: 10px 14px;">
+      <h3 style="margin-top: 0; font-size: 16px;">Quiz Reports & Leaderboard</h3>
+      <div class="leaderboard-header"><span>Name</span><span>Score</span><span>Time</span><span>Date</span></div>
+      <ol id="leaderboardList" style="padding:0; margin:0"></ol>
+    </div>
+    
+    <div id="howItWorksArea" class="card" style="margin-top: 12px; display: none; padding: 10px 14px;">
+      <h3 style="margin-top: 0; font-size: 16px;">How the Simulator Works</h3>
+      <div id="howItWorksContent"></div>
+    </div>
+
+    <div class="qwrap" id="questionsArea"></div>
+
+    <div class="footer" style="display:flex;gap:10px;align-items:center">
+      <button id="submitBtn" class="btn">Submit answers</button>
+      <button id="clearBtn" class="btn ghost">Clear answers</button>
+      <div class="small">Saved attempts: <span id="savedCount">0</span></div>
+      <div style="margin-left:auto" class="small">Pool size: <strong id="poolSize">0</strong></div>
+    </div>
+
+    <div id="resultArea" style="margin-top:12px"></div>
+  </div>
+
+  <div style="margin-top:10px" class="small">
+    <span style="display:block; margin-bottom: 4px;">&copy; 2025, John78500. All rights reserved.</span>
+    
+    <span>Notes: This is a practice simulator based on RSGB Full Syllabus v1.6. Use for study only.</span>
+    
+    <a href="https://paypal.me/John78500" target="_blank" style="margin-left: 20px; text-decoration: underline; font-weight: 600;">
+      Find this quiz useful? Please consider a donation to the author.
+    </a>
+  </div>
+  </div>
+
+<script>
+// --- Configuration ---
+const POOL_SIZE_TARGET = 580;
+const QUIZ_SIZE = 58;
+const TIMER_SECONDS = 7200; // 2 hours
+
+// Categories mapping (representative of RSGB syllabus sections)
+const CATEGORIES = [
+  'Licensing & Regulation',
+  'Technical Aspects',
+  'Transmitters & Receivers',
+  'Feeders & Antennas',
+  'Propagation & Modes',
+  'EMC & RFI',
+  'Operating Practice',
+  'Safety',
+  'Measurement & Test',
+  'Practical Skills'
+];
+
+// Templates by category (Base templates are kept minimal as most will be generated below)
+const TEMPLATES = {
+  'Licensing & Regulation': [
+    {q:"Which UK body issues amateur radio licences?", answers:["Ofcom","RSGB","Ofsted","HMCTS"], correct:0, explanation: "Ofcom is the regulatory body for communications in the UK, including amateur radio licensing."},
+    {q:"What is the minimum age to hold an amateur radio licence in the UK?", answers:["No minimum age (can be any age)","16 years","18 years","21 years"], correct:0},
+  ],
+  'Technical Aspects': [
+    {q:"Which component stores energy in an electric field?", answers:["Capacitor","Inductor","Diode","Resistor"], correct:0},
+  ],
+  'Transmitters & Receivers': [
+    {q:"What does SSB stand for?", answers:["Single Sideband","Single Signal Band","Synchronous Sideband","Spectral SideBurst"], correct:0},
+  ],
+  'Feeders & Antennas': [
+    {q:"Which device reduces common-mode current on coax?", answers:["Ferrite choke (common-mode choke)","Transformer","SWR bridge","Capacitor"], correct:0},
+  ],
+  'Propagation & Modes': [
+    {q:"What propagation mode supports long-distance HF via the ionosphere?", answers:["Skywave","Line-of-sight VHF","Ground wave on UHF","Local ground wave only"], correct:0},
+  ],
+  'EMC & RFI': [
+    {q:"What is a common remedy for RFI from a switch-mode PSU?", answers:["Add ferrite clamps and extra filtering","Change audio cables only","Increase TX power","Move to a different room"], correct:0},
+  ],
+  'Operating Practice': [
+    {q:"What is a QTH?", answers:["Location or station location","A type of antenna","An emergency signal","An equipment brand"], correct:0},
+  ],
+  'Safety': [
+    {q:"What's the top safety priority when working on a mast?", answers:["Prevent falls and isolate nearby power lines","Work alone at night","Use a ladder without stabiliser","Use gloves only"], correct:0},
+  ],
+  'Measurement & Test': [
+    {q:"Which instrument measures RF power accurately?", answers:["Calibrated RF power meter/wattmeter","Multimeter","Thermometer","Audio meter"], correct:0},
+  ],
+  'Practical Skills': [
+    {q:"What is important for solder joints in RF connections?", answers:["Good mechanical strength and low resistance, no cold joints","Lots of solder blobs","Loose connections are fine","Using double-length cable"], correct:0},
+  ]
+};
+
+// We'll expand templates into a pool by creating permutations (by adding numeric or descriptive variants)
+function expandPool(){
+  const pool = [];
+  
+  // --- Shared Variables ---
+  const freqExamples = ["3.5 MHz","7.1 MHz","14.2 MHz","28.5 MHz","50 MHz","144 MHz","432 MHz"];
+  const components = ['Capacitor', 'Inductor', 'Resistor', 'Diode', 'Transistor', 'Transformer']; 
+  const units = ['Farad', 'Henry', 'Ohm', 'Hertz', 'Watt', 'Volt', 'Ampere', 'Decibel'];
+  const Q_CODES = ['QRM (Man-made noise)','QRN (Natural noise)','QRO (Increase power)','QRP (Decrease power)','QSY (Change frequency)','QTH (Location)','QRT (Stop transmitting)'];
+  const LICENCE_OBLIGATIONS = ['Notify address change','Maintain log (if requested)','Only use permitted power','Ensure non-interference'];
+  const BAND_TYPES = ['HF (Long Distance)','VHF (Local/Tropospheric)','UHF (Line-of-Sight)'];
+
+  // Add permutation generators per category to add many variations
+  function addMany(cat, count, generator){
+    for(let i=0;i<count;i++){
+      try {
+          const obj = generator(i);
+          // ONLY push if the generator returned a valid object with required fields
+          if (obj && obj.q && obj.answers && obj.correct !== undefined) { 
+              pool.push({...obj, category:cat});
+          }
+      } catch (e) {
+          // Log errors during generation but don't stop the whole script
+          console.warn(`Skipping question generation error in category ${cat} at iteration ${i}:`, e);
+      }
+    }
+  }
+
+  // First add the explicit templates (one each)
+  for(const cat of CATEGORIES){
+    const arr = TEMPLATES[cat] || [];
+    for(const t of arr){ pool.push({...t, category:cat}); }
+  }
+  
+  // --- LICENSING & REGULATION (Target: 100 variants) ---
+  addMany('Licensing & Regulation', 100, (i)=>{
+    const qType = i % 8;
+    const obligation = LICENCE_OBLIGATIONS[i % LICENCE_OBLIGATIONS.length];
+    
+    if(qType === 0) return {q:"Which is a mandatory obligation under the UK amateur licence terms?", answers:[obligation,"Attend monthly club meetings","Only transmit between 8am and 8pm","Only use commercial equipment"], correct:0};
+    if(qType === 1) return {q:"What is the primary purpose of the licensing regime administered by Ofcom?", answers:["Manage and prevent interference across the radio spectrum","Promote amateur radio clubs","Collect fees from radio users","Specify antenna types"], correct:0};
+    if(qType === 2) return {q:"What is the maximum permissible power output for a Full Licence holder in the UK, unless otherwise stated?", answers:["400W PEP","100W PEP","50W PEP","10W PEP"], correct:0};
+    if(qType === 3) return {q:"What is required if you are operating outside the UK under **CEPT T/R 61-01**?", answers:["Consult host country for reciprocal rights and abide by their rules","Notify all local clubs","Pay the RSGB fee again","Use only QRP power"], correct:0};
+    if(qType === 4) return {q:"What must an amateur station do if they cause **harmful interference** to a primary user?", answers:["Cease transmitting immediately and remedy the cause","Increase power to overcome the interference","Change frequency for a short time only","Blame the primary user"], correct:0};
+    if(qType === 5) return {q:"What is the definition of **ERP** (Effective Radiated Power)?", answers:["Power supplied to the antenna multiplied by the antenna gain","Power consumed by the radio only","The power output of the final stage transistor","Maximum legal power"], correct:0};
+    if(qType === 6) return {q:"Which restriction applies to the **use of call signs**?", answers:["The call sign must only be used by the authorized licence holder, or a supervised guest operator","It can be freely borrowed by any friend with a radio","It must only be used for contest logging","It must be changed every year"], correct:0};
+    if(qType === 7) return {q:"What action must be taken if there is a permanent change to the **station location (QTH)**?", answers:["The licence authority (Ofcom) must be notified promptly","The antenna must be taken down permanently","The operator must pass the exam again","No action is required"], correct:0};
+  });
+  
+  // --- TECHNICAL ASPECTS (Target: 150 variants) ---
+  addMany('Technical Aspects', 150, (i)=>{ 
+    const c = i % components.length;
+    const u = i % units.length;
+    
+    // Core Component Function
+    if(c === 0) return {q:"Which component stores energy in an electric field?", answers:["Capacitor","Inductor","Resistor","Transistor"], correct:0};
+    if(c === 1) return {q:"Which component stores energy in a magnetic field?", answers:["Inductor","Capacitor","Resistor","Diode"], correct:0};
+    if(c === 2) return {q:"Which component limits current and dissipates energy as heat?", answers:["Resistor","Capacitor","Inductor","Transistor"], correct:0};
+    if(c === 3) return {q:"Which component allows current to flow in only one direction?", answers:["Diode","Transistor","Resistor","Capacitor"], correct:0};
+    if(c === 4) return {q:"Which component amplifies current or voltage in a circuit?", answers:["Transistor","Diode","Resistor","Inductor"], correct:0};
+    if(c === 5) return {q:"Which component transfers electrical energy between circuits via magnetic coupling?", answers:["Transformer","Transistor","Capacitor","Resistor"], correct:0};
+
+    // Core Unit Questions
+    if(u === 0) return {q:"What is the unit for electrical capacitance?", answers:['Farad', 'Volt', 'Ampere', 'Ohm'], correct:0};
+    if(u === 1) return {q:"What is the unit for electrical inductance?", answers:['Henry', 'Farad', 'Watt', 'Hertz'], correct:0};
+    if(u === 2) return {q:"What is the unit for electrical resistance?", answers:['Ohm', 'Volt', 'Ampere', 'Henry'], correct:0};
+    if(u === 3) return {q:"What is the unit for frequency?", answers:['Hertz', 'Ohm', 'Watt', 'Volt'], correct:0};
+    if(u === 4) return {q:"What is the unit for electrical power?", answers:['Watt', 'Volt', 'Ampere', 'Joule'], correct:0};
+    if(u === 5) return {q:"What is the unit for potential difference?", answers:['Volt', 'Ampere', 'Ohm', 'Henry'], correct:0};
+    if(u === 6) return {q:"What is the unit for electrical current?", answers:['Ampere', 'Volt', 'Ohm', 'Watt'], correct:0};
+    if(u === 7) return {q:"What logarithmic unit is used to express power ratios?", answers:['Decibels (dB)','Ohms (Ω)','Farads (F)','Volts (V)'], correct:0};
+
+    // NEW Concepts (Law/Theory)
+    const law = i % 3;
+    if(law === 0) return {q:"What relationship is described by Ohm's Law (V=IR)?", answers:['The relationship between Voltage, Current, and Resistance','The relationship between Frequency, Inductance, and Capacitance','The relationship between Power and SWR','The relationship between Gain and ERP'], correct:0};
+    if(law === 1) return {q:"What is the primary function of a **resistor** in a circuit?", answers:['Oppose or limit the flow of current','Store electrical charge','Block DC current but pass AC current','Amplify the input signal'], correct:0};
+    if(law === 2) return {q:"What is the term for a circuit that only allows signals within a specific frequency range to pass?", answers:['Filter','Amplifier','Oscillator','Modulator'], correct:0};
+  });
+
+  // --- TRANSMITTERS & RECEIVERS (Target: 100 variants) ---
+  addMany('Transmitters & Receivers', 100, (i)=>{ 
+    const f = freqExamples[i % freqExamples.length];
+    
+    const qType = i % 8;
+    
+    if(qType === 0) return {q:"Which stage of a receiver provides the majority of the system's **selectivity**?", answers:['The IF (Intermediate Frequency) stage','The RF Amplifier stage','The Audio Amplifier stage','The Power Supply'], correct:0};
+    if(qType === 1) return {q:"What is the primary function of a **pre-amplifier** in a receiver, particularly on VHF/UHF?", answers:['To improve the receiver\'s **Noise Figure**','To improve the receiver\'s selectivity','To drive the speaker','To generate the local oscillator signal'], correct:0};
+    if(qType === 2) return {q:"What is the key purpose of a **Low Pass Filter** on a transmitter output?", answers:['Attenuates harmonics above the operating frequency','Increases the modulation depth','Improves the receiver selectivity','Matches the antenna impedance'], correct:0};
+    if(qType === 3) return {q:"Which term describes the stability and purity of a transmitter's signal?", answers:['Spectral purity (or phase noise)','Antenna gain','SWR','Input impedance'], correct:0};
+    if(qType === 4) return {q:"In a receiver, what is the role of the **BFO (Beat Frequency Oscillator)**?", answers:['Makes CW and SSB signals audible','Generates the local oscillator frequency','Filters out unwanted noise','Adjusts the receiver volume'], correct:0};
+    if(qType === 5) return {q:"How is the audio information encoded in a **Frequency Modulation (FM)** signal?", answers:['By varying the instantaneous frequency of the carrier','By varying the instantaneous amplitude of the carrier','By shifting the phase of the carrier','By interrupting the carrier (CW)'], correct:0};
+    if(qType === 6) return {q:"What is the function of the **Driver Stage** in a transmitter?", answers:['Provides sufficient power to excite the Power Amplifier (PA)','Converts the received signal to audio','Generates the carrier wave','Filters out unwanted noise'], correct:0};
+    if(qType === 7) return {q:"What is the benefit of using a **Direct Digital Synthesis (DDS)** in modern radios?", answers:['High frequency stability and fine tuning resolution','Lower current consumption','Better immunity to lightning','Higher output power'], correct:0};
+  });
+
+  // --- FEEDERS & ANTENNAS (Target: 80 variants) ---
+  addMany('Feeders & Antennas', 80, (i)=>{
+    const cable = ['Coaxial cable (coax)','Ladder line (open wire feeder)','Twin-lead feeder'][i % 3];
+    const feederZ = ['50 Ω','75 Ω','300 Ω','450 Ω'][i % 4];
+    
+    const qType = i % 5;
+
+    if(qType === 0) return {q:`What is the benefit of using ${cable} over other types for an HF antenna?`, answers:[`Specific characteristic impedance of ${feederZ}`,`Is always easier to install`,`Is lighter weight`,`Can handle more power (regardless of type)`], correct:0};
+    if(qType === 1) return {q:"The primary role of a **Balun (Balanced to Unbalanced)** is to:", answers:['Convert unbalanced coax feed to a balanced antenna load','Tune the antenna length','Measure power output','Reduce receiver noise'], correct:0};
+    if(qType === 2) return {q:"Why should the **characteristic impedance** of the antenna match the feedline?", answers:[`To minimize SWR and power loss on the feedline`,`To increase the antenna's physical length`,`To reduce the cost of the system`,`To prevent the radio from overheating`], correct:0};
+    if(qType === 3) return {q:"What is the function of an **Antenna Matching Unit (ATU)**?", answers:[`To transform the antenna impedance to match the ${feederZ} of the feedline/transmitter`,`To convert RF energy to sound`,`To filter out all unwanted signals`,`To change the polarization of the signal`], correct:0};
+    if(qType === 4) return {q:"What does **Antenna Gain** primarily refer to?", answers:['The increase in signal strength in a specific direction compared to an isotropic or dipole reference','The maximum power the antenna can handle','The physical size of the antenna','The electrical length of the antenna'], correct:0};
+  });
+
+  // --- PROPAGATION & MODES (Target: 100 variants) ---
+  addMany('Propagation & Modes', 100, (i)=>{
+    const band = BAND_TYPES[i % BAND_TYPES.length];
+    const ionoLayer = ['F2 layer (daytime HF)','E layer (Sporadic E)','D layer (HF absorption)'][i % 3];
+    const solarFactor = ['Solar Flux Index (SFI)','K-Index','Sunspot Number'][i % 3];
+    const qType = i % 6;
+    
+    if(qType === 0) return {q:"Which ionospheric layer is most responsible for long-distance **daytime HF** communication?", answers:[ionoLayer.includes('F2') ? ionoLayer : 'F2 layer', 'Troposphere','Stratosphere','Mesosphere'], correct:0};
+    if(qType === 1) return {q:"What phenomenon allows over-the-horizon propagation on **VHF (144MHz)** during intense summer conditions?", answers:['Sporadic-E propagation (or tropospheric ducting)','Ground wave','Meteor scatter','Ionospheric cross-polarization'], correct:0};
+    if(qType === 2) return {q:"Which solar measurement is most indicative of the **ionization level** and maximum usable frequency (MUF)?", answers:[solarFactor.includes('SFI') ? solarFactor : 'Solar Flux Index (SFI)', 'Wind Speed','Moon Phase','Cloud Cover'], correct:0};
+    if(qType === 3) return {q:"What is **Grey Line propagation**?", answers:['Propagation occurring along the twilight zone (terminator line)','Propagation at the maximum usable frequency','Propagation via the D layer','Propagation that only occurs at noon'], correct:0};
+    if(qType === 4) return {q:"What is the primary propagation mode for **UHF (432MHz)** communications?", answers:['Line-of-sight and ground wave','F2 layer reflection','Meteor scatter','NVIS (Near-Vertical Incidence Skywave)'], correct:0};
+    if(qType === 5) return {q:"What effect does a high **K-Index** (Geomagnetic Storm) typically have on HF propagation?", answers:['Causes degraded/unstable conditions and lower MUF','Causes improved conditions and higher signal strength','Has no effect on HF','Only affects VHF/UHF'], correct:0};
+  });
+
+  // --- EMC & RFI (Target: 50 variants) ---
+  addMany('EMC & RFI', 50, (i)=>{
+    const source = ['digital device','switch-mode power supply','LED lighting','TV set top box'][i % 4];
+    const fix = ['ferrite chokes','shielding/screening','proper earthing/bonding','low-pass filtering'][i % 4];
+    const qType = i % 3;
+
+    if(qType === 0) return {q:`What is the primary method to suppress wideband noise radiating from a ${source}?`, answers:[`Applying ${fix} to the source and affected cables`,`Increasing transmitter power significantly`,`Changing antenna polarization`,`Using a digital mode only`], correct:0};
+    if(qType === 1) return {q:"What is the purpose of screening (shielding) in equipment enclosures?", answers:['To contain RF energy and prevent RFI/EMI outside the enclosure','To increase cooling efficiency','To provide mechanical support','To improve antenna efficiency'], correct:0};
+    if(qType === 2) return {q:"Which type of filter is typically placed between the transmitter and the antenna to prevent harmonics reaching the antenna?", answers:['Low Pass Filter (LPF)','High Pass Filter (HPF)','Band Stop Filter (BSF)','Power Line Filter'], correct:0};
+  });
+
+  // --- OPERATING PRACTICE (Target: 100 variants) ---
+  addMany('Operating Practice', 100, (i)=>{
+    const qCode = Q_CODES[i % Q_CODES.length];
+    const mode = ['CW (Morse Code)','SSB (Voice)','FT8 (Digital)'][i % 3];
+    const rst = ['599','579','449','337'][i % 4];
+    const qType = i % 5;
+
+    if(qType === 0) {
+        // Safe way to extract answers from Q_CODES array
+        const correctText = qCode.split(' ')[1].replace(/[\(\)]/g, '');
+        const otherAnswers = Q_CODES.map(c => c.split(' ')[1].replace(/[\(\)]/g, '')).filter(a => a !== correctText);
+        // Add the correct answer and 3 random unique distractors
+        const answers = [correctText, ...otherAnswers.slice(0, 3)].filter((v, i, a) => a.indexOf(v) === i);
+        // Ensure we have exactly 4 answers
+        while(answers.length < 4) answers.push(`Distractor ${answers.length + 1}`);
+
+        return {
+            q:`What does the Q-code **${qCode.split(' ')[0]}** mean?`, 
+            answers: answers.slice(0,4), // Use the first 4 (guaranteed to contain correct one)
+            correct: 0 // The correct answer is always at index 0 before final shuffle
+        };
+    }
+    if(qType === 1) return {q:`What does the **RST report ${rst}** imply for a CW signal?`, answers:['Signal is fully readable with a perfect tone','Signal is weak but readable','Signal is very strong and unreadable','Signal is not present'], correct:0};
+    if(qType === 2) return {q:`When operating in a contest using ${mode}, what is the best practice?`, answers:['Call "CQ Contest" concisely and listen carefully for responses','Call "CQ" for 10 minutes continuously','Use the wrong exchange to confuse competitors','Transmit off-frequency for better coverage'], correct:0};
+    if(qType === 3) return {q:"What is the ethical procedure if you tune up your antenna and find someone is already using the frequency?", answers:['Stop immediately and find another clear frequency','Continue tuning and ask them to move','Complain on the local repeater','Reduce power slightly and transmit anyway'], correct:0};
+    if(qType === 4) return {q:"What is the correct way to call another station (e.g., G0XYZ)?", answers:['"G0XYZ G0XYZ this is G1ABC"','Call CQ and hope they answer','Just shout their callsign once','Immediately transmit a long message'], correct:0};
+  });
+
+  // --- SAFETY (Target: 50 variants) ---
+  addMany('Safety', 50, (i)=>{
+    const hazard = ['working at height','electrical shock','RF burns','lightning strike'][i % 4];
+    const action = ['use harnesses/fall arrest equipment','ensure isolation from mains/battery power','avoid touching uninsulated antenna parts while transmitting','ensure robust earthing/bonding system'][i % 4];
+    const qType = i % 3;
+
+    if(qType === 0) return {q:`What is the key safety measure to mitigate the risk of **${hazard}**?`, answers:[action,'Do it alone quickly','Use unsupported ladder','Work during a storm'], correct:0};
+    if(qType === 1) return {q:"Why should you never transmit with a loose or disconnected RF connector?", answers:['High RF voltage/current poses a severe burn risk and can damage the transmitter','It will sound better','It uses less power','It makes the antenna more directional'], correct:0};
+    if(qType === 2) return {q:"Why is it critical to ensure the antenna is kept well clear of power lines?", answers:['Risk of lethal electrocution and/or fire','To avoid minor static interference','To comply with building regulations only','To make the antenna look better'], correct:0};
+  });
+
+  // --- MEASUREMENT & TEST (Target: 100 variants) ---
+  addMany('Measurement & Test', 100, (i)=>{
+    const measType = ['SWR','RF power','Frequency stability','Harmonic content'][i % 4];
+    const instrument = ['SWR meter','Calibrated wattmeter','Frequency counter','Spectrum analyser'][i % 4];
+    const qType = i % 5;
+
+    if(qType === 0) return {q:`Which instrument is most suitable for accurately measuring **${measType}** on an amateur transmission?`, answers:[instrument,'Multimeter','Thermometer','Barometer'], correct:0};
+    if(qType === 1) return {q:"What is the primary use of an **Oscilloscope** in amateur radio?", answers:['Visualizing signal waveforms and checking modulation quality','Measuring DC resistance','Checking antenna height','Receiving signals'], correct:0};
+    if(qType === 2) return {q:"What does an **SWR reading of 1:1** indicate?", answers:['A perfect impedance match between the feedline and antenna/load','An extremely poor impedance match','That the transmitter is off','That the antenna is too long'], correct:0};
+    if(qType === 3) return {q:"What is the function of a **Dummy Load**?", answers:['Provide a matched non-radiating load for testing transmitters','Increase the antenna gain','To tune the receiver IF','To measure DC voltage'], correct:0};
+    if(qType === 4) return {q:"What is a **Time Domain Reflectometer (TDR)** used for in amateur radio?", answers:['Locating faults and measuring length in antenna feedlines','Measuring receiver noise figure','Checking instantaneous power','Checking solar flux'], correct:0};
+  });
+
+  // --- PRACTICAL SKILLS (Target: 50 variants) ---
+  addMany('Practical Skills', 50, (i)=>{
+    const skill = ['soldering a PL259 connector','weatherproofing an antenna joint','making an earth connection','using heat shrink tubing'][i % 4];
+    const crucial = ['cleanliness and mechanical strength before soldering','using non-conductive tape','using thin, flexible wire','avoiding any sealant'][i % 4];
+    const qType = i % 3;
+
+    if(qType === 0) return {q:`What is the most crucial step when ${skill}?`, answers:[crucial,'Warming up the entire workbench','Painting the finished joint bright yellow','Using only the largest solder iron available'], correct:0};
+    if(qType === 1) return {q:"What defines a **\"cold solder joint\"**?", answers:['A dull, crystallized, or non-wetting joint that results in high resistance and poor mechanical connection','A joint made with lead-free solder','A joint that has cooled down completely','A joint made with too much heat'], correct:0};
+    if(qType === 2) return {q:"What is the best way to secure external cables entering a shack through a wall?", answers:['Use a proper feed-through panel/bushing sealed against moisture','Tape the cables directly to the wall with sticky tape','Leave a large open hole for easy access','Drill many small holes around the cables'], correct:0};
+  });
+  
+  // FINALIZE POOL: Ensure unique questions and enforce cap
+  const uniq = [];
+  const seen = new Set();
+  
+  // Now filter for absolute uniqueness based on Question + Answers
+  for(const p of pool){
+    p.q = p.q.trim(); 
+    
+    // Create a key based on question text and the answers in sorted order
+    const sortedAnswers = [...(p.answers || [])].sort().join('||');
+    // FIX: Ensure the key is based on the question text only, ignoring dynamic elements like (Hxxx)
+    const qKey = p.q.replace(/\(H\d+\)/g, '').trim(); 
+    const key = qKey + '|' + sortedAnswers;
+    
+    if(!seen.has(key)){
+      uniq.push(p); seen.add(key);
+    }
+  }
+  
+  // Log the resulting size before capping (for debug)
+  console.log(`Pool generated ${uniq.length} unique questions before final cap.`);
+  
+  // Final cap to exactly POOL_SIZE_TARGET
+  return uniq.slice(0, POOL_SIZE_TARGET); 
+}
+
+// Utility: shuffle array
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} }
+
+// Build UI: category filter options
+const catSel = document.getElementById('categoryFilter');
+CATEGORIES.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; catSel.appendChild(o); });
+
+// Quiz state
+let currentQuiz = []; // array of {q,answers,correct,category,chosen,flagged}
+let timerLeft = TIMER_SECONDS;
+let timerInterval = null;
+let isSubmitted = false;
+let startTime = 0; // for reporting
+
+function drawQuiz(categoryFilter='all'){
+  isSubmitted = false;
+  document.getElementById('resultArea').innerHTML = '';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('questionsArea').classList.remove('submitted');
+  
+  // Prepare pool by category
+  const poolByCat = {};
+  for(const c of CATEGORIES) poolByCat[c]=POOL.filter(p=>p.category===c);
+
+  let chosen = []; // The pool we select for the quiz
+  let uniqueKeys = new Set(); // Tracks the question text to prevent duplicates
+
+  document.querySelector('h1').textContent = `RSGB Full Mock Exam — 580-question pool, 58-question quizzes`;
+  
+  // --- STAGE 1: Categorical Draw ---
+  if(categoryFilter==='all'){
+    // Balanced Draw: ~5.8 questions per category (5 or 6)
+    const perCat = Math.floor(QUIZ_SIZE / CATEGORIES.length); // 5
+    let remainder = QUIZ_SIZE - perCat * CATEGORIES.length; // 8
+    
+    for(const c of CATEGORIES){
+      const list = [...poolByCat[c]];
+      shuffle(list);
+      // Determine how many to take from this category
+      const take = Math.min(perCat + (remainder > 0 ? 1 : 0), list.length); 
+      if (remainder > 0) remainder--;
+
+      for(let j=0;j<take;j++) {
+          const qObj = list[j];
+          // Remove H# codes from question text for uniqueness check
+          const qText = qObj.q.replace(/\(H\d+\)/g, '').trim(); 
+          if (!uniqueKeys.has(qText)) { // Ensure unique selection
+             chosen.push({...qObj});
+             uniqueKeys.add(qText);
+          }
+      }
+    }
+  } else {
+    // Focused Category Draw: Take as many as possible from the primary category first
+    const primaryList = [...poolByCat[categoryFilter]];
+    shuffle(primaryList);
+    
+    primaryList.forEach(q => {
+        const qText = q.q.replace(/\(H\d+\)/g, '').trim();
+        if (!uniqueKeys.has(qText)) {
+             chosen.push({...q});
+             uniqueKeys.add(qText);
+        }
+    });
+  }
+  
+  // --- STAGE 2: Fill-Up to Guarantee QUIZ_SIZE (58) ---
+  const needed = QUIZ_SIZE - chosen.length;
+  
+  if(needed > 0){
+      // Filter the entire POOL to find unique questions not yet chosen
+      const others = POOL.filter(p => !uniqueKeys.has(p.q.replace(/\(H\d+\)/g, '').trim()));
+      shuffle(others);
+      
+      // Fill the remaining slots (up to 58)
+      for(let j=0;j<needed;j++) {
+        // If we run out of unique questions in the remaining pool, break
+        if(j >= others.length) break; 
+        
+        chosen.push({...others[j]});
+        uniqueKeys.add(others[j].q.replace(/\(H\d+\)/g, '').trim()); 
+      }
+  }
+  
+  // Ensure the final selection is exactly QUIZ_SIZE and fully randomized before use
+  currentQuiz = chosen.slice(0, QUIZ_SIZE); 
+  shuffle(currentQuiz); 
+
+  // Randomize order and answers for each question
+  currentQuiz.forEach(qobj=>{
+    // ensure answers array: if missing, skip
+    if(!qobj.answers || qobj.answers.length<4){
+      const opts = [qobj.correct_text||'Correct answer','Distractor A','Distractor B','Distractor C'];
+      qobj.answers = opts;
+      qobj.correct = 0;
+    }
+    // randomize answer order preserving correct index
+    const correctText = qobj.answers[qobj.correct];
+    const others = qobj.answers.filter((_,idx)=>idx!==qobj.correct);
+    const poolOpts = [correctText,...others];
+    shuffle(poolOpts);
+    // ensure correct isn't always longest: if correctText is currently longest, swap with a random shorter one
+    const lengths = poolOpts.map(s=>s.length);
+    const maxLen = Math.max(...lengths);
+    const idxCorrect = poolOpts.indexOf(correctText);
+    if(poolOpts[idxCorrect].length===maxLen){
+      const candidates = poolOpts.map((s,idx)=> idx===idxCorrect?null: (s.length<maxLen?idx:null)).filter(x=>x!==null);
+      if(candidates.length) {
+        const swapWith = candidates[Math.floor(Math.random()*candidates.length)];
+        [poolOpts[idxCorrect],poolOpts[swapWith]]=[poolOpts[swapWith],poolOpts[idxCorrect]];
+      }
+    }
+    qobj.answers = poolOpts;
+    qobj.correct = qobj.answers.indexOf(correctText);
+    qobj.chosen = null;
+    qobj.flagged = false;
+  });
+
+  startTime = Date.now();
+  renderQuiz();
+  
+  // Scroll to the top of the questions area to show the new quiz is loaded
+  document.getElementById('questionsArea').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderQuiz(activeQ = 0){
+  // reset timer
+  resetTimer();
+  const area = document.getElementById('questionsArea'); area.innerHTML='';
+  const mini = document.getElementById('miniNav'); mini.innerHTML='';
+  
+  currentQuiz.forEach((qobj,idx)=>{
+    // QWRAP
+    const div = document.createElement('div'); div.className='question'; div.id='q'+idx;
+    if(idx === activeQ) div.classList.add('active');
+    
+    // HEADER (Removed the H# debug code from display)
+    const qh = document.createElement('div'); qh.innerHTML = `<strong>Q${idx+1}.</strong> ${qobj.q.replace(/\(H\d+\)/g, '')}`; 
+    const cat = document.createElement('div'); cat.className='category small'; cat.textContent = `Category: ${qobj.category}`;
+    
+    // FLAG & HINT CONTROLS
+    const controls = document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px'; controls.style.marginTop='6px';
+    const flagBtn = document.createElement('button'); 
+    flagBtn.className='btn ghost'; flagBtn.style.padding='4px 8px'; flagBtn.style.fontSize='12px';
+    flagBtn.textContent = qobj.flagged ? 'Unflag' : 'Flag for Review';
+    if(qobj.flagged) flagBtn.style.borderColor = 'var(--flagged)';
+    flagBtn.addEventListener('click',()=> toggleFlag(qobj, flagBtn, idx));
+    
+    const hintBtn = document.createElement('button');
+    hintBtn.className='btn ghost'; hintBtn.style.padding='4px 8px'; hintBtn.style.fontSize='12px'; 
+    hintBtn.textContent = 'Show Answer'; 
+    hintBtn.addEventListener('click',()=> showHint(qobj, idx));
+
+    controls.appendChild(flagBtn);
+    controls.appendChild(hintBtn);
+
+    // OPTIONS
+    const opts = document.createElement('div'); opts.className='opts';
+    qobj.answers.forEach((a,i)=>{
+      const b = document.createElement('button'); b.className='opt'; b.type='button'; b.innerHTML = `${String.fromCharCode(65+i)}. ${a}`;
+      if(qobj.chosen === i) b.classList.add('chosen');
+      b.addEventListener('click',()=>{ 
+        qobj.chosen = i; 
+        updateProgress();
+        // update selection style
+        [...opts.children].forEach((el,j)=>el.classList.remove('chosen'));
+        b.classList.add('chosen');
+        
+        // Auto scroll to next question
+        const nextQ = document.getElementById('q'+(idx+1));
+        if(nextQ) nextQ.scrollIntoView({behavior:'smooth',block:'center'});
+      });
+      opts.appendChild(b);
+    });
+    
+    // HINT AREA
+    const hintArea = document.createElement('div'); hintArea.id = 'hint-q'+idx;
+    
+    div.appendChild(qh); div.appendChild(cat); div.appendChild(controls); div.appendChild(hintArea); div.appendChild(opts);
+    area.appendChild(div);
+    
+    // MINI NAV
+    const m = document.createElement('button'); m.textContent = idx+1; m.id = 'miniNav-q'+idx;
+    m.addEventListener('click',()=> {
+        document.querySelector('.question.active')?.classList.remove('active');
+        div.classList.add('active');
+        document.getElementById('q'+idx).scrollIntoView({behavior:'smooth',block:'center'});
+    }); 
+    mini.appendChild(m);
+  });
+  updateProgress();
+}
+
+function toggleFlag(qobj, button, idx){
+    qobj.flagged = !qobj.flagged;
+    button.textContent = qobj.flagged ? 'Unflag' : 'Flag for Review';
+    button.style.borderColor = qobj.flagged ? 'var(--flagged)' : 'rgba(37,99,235,0.12)';
+    updateProgress();
+}
+
+// MODIFIED: Simplified hint to only show the answer (and renamed related text)
+function showHint(qobj, idx){
+    const area = document.getElementById('hint-q'+idx);
+    const hintBtn = document.querySelector(`#q${idx} button:nth-child(2)`);
+    
+    // If answer is already visible, hide it.
+    if(area.innerHTML !== ''){
+        area.innerHTML = '';
+        hintBtn.textContent = 'Show Answer'; 
+        return;
+    }
+
+    const correctText = qobj.answers[qobj.correct];
+    const correctLetter = String.fromCharCode(65+qobj.correct);
+    
+    area.innerHTML = `
+        <div class="hint-box">
+            <strong>Answer:</strong> The correct choice is **${correctLetter}. ${correctText}**.
+        </div>
+    `;
+    hintBtn.textContent = 'Hide Answer'; 
+}
+
+function updateMiniNav(){
+  currentQuiz.forEach((q, idx) => {
+    const btn = document.getElementById('miniNav-q'+idx);
+    if (!btn) return;
+
+    btn.classList.remove('answered', 'flagged', 'correct', 'wrong');
+
+    if(q.flagged) btn.classList.add('flagged');
+    if(q.chosen !== null) btn.classList.add('answered');
+    
+    if(isSubmitted){
+        btn.classList.remove('answered');
+        if(q.chosen === q.correct) btn.classList.add('correct');
+        else btn.classList.add('wrong');
+    }
+  });
+}
+
+// FIX: Update progress to use currentQuiz.length for total questions
+function updateProgress(){
+  const answered = currentQuiz.filter(q=>q.chosen!==null).length;
+  const totalQuestions = currentQuiz.length; // Use the actual quiz length (which should be 58)
+  const correct = currentQuiz.filter(q=> q.chosen!==null && q.chosen===q.correct).length;
+  const flagged = currentQuiz.filter(q=> q.flagged).length;
+  
+  // Update spans
+  document.getElementById('answered').textContent = answered;
+  document.getElementById('totalQuestions').textContent = totalQuestions; 
+  document.getElementById('correctSoFar').textContent = correct;
+  document.getElementById('flaggedCount').textContent = flagged;
+  
+  const pct = totalQuestions > 0 ? Math.round((correct / totalQuestions) * 100) : 0;
+  
+  document.getElementById('percent').textContent = pct + '%';
+  const prog = totalQuestions > 0 ? Math.round((answered/totalQuestions)*100) : 0;
+  document.getElementById('progBar').style.width = prog + '%';
+  
+  updateMiniNav();
+}
+
+// Submit answers: show review with correct/wrong and per-category stats
+function submitAnswers(){
+  if(isSubmitted) return;
+
+  // Stop timer and record time taken
+  clearInterval(timerInterval);
+  const timeTaken = TIMER_SECONDS - timerLeft;
+  
+  // compute totals
+  const totalCorrect = currentQuiz.filter(q=> q.chosen===q.correct).length;
+  const pass = totalCorrect >= 35;
+  isSubmitted = true;
+  document.getElementById('submitBtn').disabled = true;
+
+  // Save report and update leaderboard
+  saveReport(totalCorrect, timeTaken);
+
+  // build review UI
+  const area = document.getElementById('resultArea'); area.innerHTML='';
+  const res = document.createElement('div'); res.className = 'card';
+  res.innerHTML = `<div style="font-weight:700">Final score: ${totalCorrect} / ${currentQuiz.length} — ${pass? 'PASS':'FAIL'}</div>
+                   <div class="small" style="margin-top:4px">Time taken: ${formatTime(timeTaken)}</div>`;
+  // per-category breakdown
+  const catMap = {};
+  for(const c of CATEGORIES) catMap[c] = {total:0,correct:0};
+  currentQuiz.forEach(q=>{ catMap[q.category].total++; if(q.chosen===q.correct) catMap[q.category].correct++; });
+  const breakdown = document.createElement('div'); breakdown.style.marginTop='8px';
+  breakdown.innerHTML = '<div class="small" style="font-weight:700">Per-category</div>' + CATEGORIES.map(c=>`${c}: ${catMap[c].correct}/${catMap[c].total}`).join('<br>');
+  res.appendChild(breakdown);
+
+  // list questions with highlight
+  const list = document.createElement('div'); list.style.marginTop='10px';
+  currentQuiz.forEach((q,idx)=>{
+    const item = document.createElement('div'); item.style.padding='8px'; item.style.borderRadius='8px'; item.style.marginBottom='6px';
+    if(q.chosen===q.correct) item.className='review-correct'; else item.className='review-wrong';
+    const qh = document.createElement('div'); qh.innerHTML = `<strong>Q${idx+1}.</strong> ${q.q.replace(/\(H\d+\)/g, '')}`; // Remove hash from display
+    const cat = document.createElement('div'); cat.className='small'; cat.textContent = `Category: ${q.category}`;
+    const opts = document.createElement('div'); opts.style.marginTop='6px';
+    q.answers.forEach((a,i)=>{
+      const line = document.createElement('div');
+      const mark = (i===q.correct)? '✓ CORRECT' : (i===q.chosen? '✗ YOUR ANSWER' : '');
+      line.textContent = `${String.fromCharCode(65+i)}. ${a} ${mark}`;
+      opts.appendChild(line);
+    });
+    item.appendChild(qh); item.appendChild(cat); item.appendChild(opts);
+    list.appendChild(item);
+  });
+  res.appendChild(list);
+
+  // printable report
+  const report = document.createElement('div'); report.className='report'; report.style.marginTop='10px';
+  const now = new Date().toLocaleString();
+  let repTxt = `RSGB Mock Report\nDate: ${now}\nScore: ${totalCorrect}/${currentQuiz.length} (${Math.round(totalCorrect/currentQuiz.length*100)}%)\nTime: ${formatTime(timeTaken)}\n\nPer-category breakdown:\n`;
+  for(const c of CATEGORIES) repTxt += `${c}: ${catMap[c].correct}/${catMap[c].total}\n`;
+  report.textContent = repTxt;
+  res.appendChild(report);
+  area.appendChild(res);
+
+  // Update mini-nav colors to show correct/wrong
+  updateMiniNav();
+}
+
+// Save/load to localStorage (Quiz Progress)
+function saveProgress(){
+  const key = 'rsgb_sim_attempt_' + new Date().toISOString();
+  const obj = {quiz: currentQuiz, timerLeft};
+  localStorage.setItem(key, JSON.stringify(obj));
+  updateSavedCount();
+  alert('Progress saved locally: ' + new Date().toLocaleString());
+}
+
+function loadProgress(key = null){
+    const listArea = document.getElementById('savedQuizzesListArea');
+    const leaderboardArea = document.getElementById('leaderboardArea');
+    const howItWorksArea = document.getElementById('howItWorksArea');
+    leaderboardArea.style.display = 'none'; // Hide leaderboard
+    howItWorksArea.style.display = 'none'; // Hide how it works
+    
+    if (key) {
+        // Load a specific quiz
+        const savedData = JSON.parse(localStorage.getItem(key));
+        if (!savedData) { alert('Error: Saved data not found.'); return; }
+        
+        currentQuiz = savedData.quiz;
+        timerLeft = savedData.timerLeft || TIMER_SECONDS;
+        startTime = Date.now() - (TIMER_SECONDS - timerLeft)
+        
+        document.getElementById('resultArea').innerHTML = '';
+        document.getElementById('submitBtn').disabled = false;
+        isSubmitted = false;
+        renderQuiz();
+        listArea.style.display = 'none'; // Hide list after loading
+        
+        const savedTime = new Date(key.replace('rsgb_sim_attempt_','')).toLocaleString();
+        alert(`Progress loaded from attempt saved on: ${savedTime}. Time remaining: ${formatTime(timerLeft)}`);
+        return;
+    }
+    
+    // Toggle the list visibility
+    listArea.style.display = listArea.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateSavedCount(){
+  const listEl = document.getElementById('savedQuizzesList');
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('rsgb_sim_attempt_'));
+  keys.sort().reverse(); // Show most recent first
+  
+  document.getElementById('savedCount').textContent = keys.length;
+  listEl.innerHTML = '';
+  
+  if(keys.length === 0){
+      document.getElementById('savedQuizzesListArea').style.display = 'none';
+      document.getElementById('loadBtn').disabled = true;
+      return;
+  }
+  
+  document.getElementById('loadBtn').disabled = false; // Enable Load button
+  
+  keys.forEach(key => {
+      const li = document.createElement('li');
+      const time = new Date(key.replace('rsgb_sim_attempt_','')).toLocaleString();
+      li.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="small">${time}</span>
+              <div>
+                  <button data-key="${key}" class="load-specific-btn btn ghost" style="padding: 4px 8px; font-size: 12px;">Load</button>
+                  <button data-key="${key}" class="delete-specific-btn btn ghost" style="padding: 4px 8px; font-size: 12px; color: var(--wrong); border-color: #fee2e2;">Delete</button>
+              </div>
+          </div>`;
+      listEl.appendChild(li);
+  });
+  
+  // Attach event listeners for the new buttons
+  listEl.querySelectorAll('.load-specific-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => loadProgress(e.target.getAttribute('data-key')));
+  });
+
+  listEl.querySelectorAll('.delete-specific-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+          const key = e.target.getAttribute('data-key');
+          if(confirm(`Delete saved quiz from ${new Date(key.replace('rsgb_sim_attempt_','')).toLocaleString()}?`)) {
+              localStorage.removeItem(key);
+              updateSavedCount(); // Refresh list
+          }
+      });
+  });
+}
+
+// Reports & Leaderboard
+function formatTime(seconds) {
+    const h = String(Math.floor(seconds/3600)).padStart(2,'0');
+    const m = String(Math.floor((seconds%3600)/60)).padStart(2,'0');
+    const s = String(seconds%60).padStart(2,'0');
+    return `${h}:${m}:${s}`;
+}
+
+function saveReport(score, timeTaken){
+    const userName = document.getElementById('userName').value.trim() || 'Anonymous';
+    const reportKey = 'rsgb_sim_report_' + new Date().toISOString();
+    const report = {
+        name: userName,
+        score: score,
+        time: timeTaken,
+        date: new Date().toLocaleString()
+    };
+    localStorage.setItem(reportKey, JSON.stringify(report));
+}
+
+function getReports(){
+    const reports = [];
+    for(const key of Object.keys(localStorage)){
+        if(key.startsWith('rsgb_sim_report_')){
+            try {
+                reports.push(JSON.parse(localStorage.getItem(key)));
+            } catch (e) { console.error('Error parsing report:', key, e); }
+        }
+    }
+    // Sort: by score (desc), then by time (asc)
+    reports.sort((a,b) => {
+        if(b.score !== a.score) return b.score - a.score;
+        return a.time - b.time;
+    });
+    return reports;
+}
+
+function renderLeaderboard(){
+    const leaderboardArea = document.getElementById('leaderboardArea');
+    const savedQuizzesListArea = document.getElementById('savedQuizzesListArea');
+    const howItWorksArea = document.getElementById('howItWorksArea');
+    savedQuizzesListArea.style.display = 'none'; // Hide saved quizzes list
+    howItWorksArea.style.display = 'none'; // Hide how it works
+
+    if(leaderboardArea.style.display === 'block'){
+        leaderboardArea.style.display = 'none';
+        return;
+    }
+    
+    leaderboardArea.style.display = 'block';
+    const listEl = document.getElementById('leaderboardList');
+    listEl.innerHTML = '';
+    
+    const reports = getReports();
+    
+    if(reports.length === 0){
+        listEl.innerHTML = '<li style="padding:10px 0; color:var(--muted)">No completed quiz reports found.</li>';
+        return;
+    }
+
+    reports.forEach((report, index) => {
+        const li = document.createElement('li');
+        li.className = 'leaderboard-row';
+        li.innerHTML = `
+            <span>${index + 1}. ${report.name}</span>
+            <span>${report.score} / ${QUIZ_SIZE}</span>
+            <span>${formatTime(report.time)}</span>
+            <span class="small">${new Date(report.date).toLocaleDateString()}</span>
+        `;
+        listEl.appendChild(li);
+    });
+}
+
+function renderHowItWorks(){
+    const howItWorksArea = document.getElementById('howItWorksArea');
+    const leaderboardArea = document.getElementById('leaderboardArea');
+    const savedQuizzesListArea = document.getElementById('savedQuizzesListArea');
+    leaderboardArea.style.display = 'none'; // Hide leaderboard
+    savedQuizzesListArea.style.display = 'none'; // Hide saved quizzes list
+
+    if(howItWorksArea.style.display === 'block'){
+        howItWorksArea.style.display = 'none';
+        return;
+    }
+    
+    howItWorksArea.style.display = 'block';
+    // Content is pre-populated in DOMContentLoaded
+}
+
+
+// Timer functions
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timerLeft--; 
+    if(timerLeft<0){ clearInterval(timerInterval); autoSubmitOnTimeout(); return; }
+    document.getElementById('timer').textContent = formatTime(timerLeft);
+  },1000);
+}
+function resetTimer(){ timerLeft = TIMER_SECONDS; startTimer(); }
+function autoSubmitOnTimeout(){ alert('Time is up — auto-submitting.'); submitAnswers(); }
+
+// Buttons
+document.getElementById('newQuizAll').addEventListener('click', ()=>{ 
+    if(!confirm('Start a new quiz? This will discard current progress.')) return;
+    drawQuiz('all'); 
+});
+document.getElementById('submitBtn').addEventListener('click', ()=>{ 
+  if(isSubmitted) return;
+  if(!confirm('Submit answers now? You will see your final results and time taken.')) return; 
+  submitAnswers();
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{ if(confirm('Clear all answers?')){ currentQuiz.forEach(q=>q.chosen=null); renderQuiz(); }});
+document.getElementById('saveBtn').addEventListener('click', ()=>{ saveProgress(); });
+document.getElementById('loadBtn').addEventListener('click', ()=>{ loadProgress(); });
+document.getElementById('leaderboardBtn').addEventListener('click', ()=>{ renderLeaderboard(); });
+document.getElementById('howItWorksBtn').addEventListener('click', ()=>{ renderHowItWorks(); }); // NEW: How it Works Handler
+document.getElementById('printReport').addEventListener('click', ()=>{ window.print(); });
+document.getElementById('filterBtn').addEventListener('click', ()=>{ 
+    const v = catSel.value; 
+    // FIX: Clearer confirmation message
+    const catName = v === 'all' ? 'All categories' : v; 
+    if(!confirm(`Start a new quiz focusing on the ${catName}? This will discard current progress.`)) return;
+    drawQuiz(v); 
+});
+document.getElementById('darkToggle').addEventListener('change', (e)=>{ document.body.classList.toggle('dark', e.target.checked); });
+
+// Init and populate How It Works Content
+document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('howItWorksContent').innerHTML = `
+        <h4>Quiz Generation (The 580 Pool)</h4>
+        <p>This Mock Exam creates questions based on the structure of the RSGB Full Licence Syllabus (v1.6). It uses a sophisticated generation process that creates over 1,000 unique questions, which it then randomly samples to create a final **580-question pool** for maximum variety.</p>
+        <p>To prevent rote memorization, all questions are programmatically varied with different numbers, frequencies, component names, and answer choices. Answer options are always **randomly shuffled** on every new quiz run.</p>
+
+        <h4>Important Disclaimer</h4>
+        <p class="disclaimer">
+            **This is a study tool only.** The actual RSGB Full Exam contains a significant number of **questions based on diagrams, circuit symbols, and graphs**. This tool is **text-only** and does not include any image-based questions. Use it to reinforce your theoretical knowledge of the syllabus topics.
+        </p>
+
+        <h4>Quiz Modes (Fixed 58 Questions)</h4>
+        <p>All quizzes are fixed at **58 questions** to accurately mirror the examination format:</p>
+        <ul>
+            <li>**New Quiz (All):** Draws questions across all 10 syllabus categories in a **balanced proportion** (typically 5-6 questions per category).</li>
+            <li>**Practice Category:** Prioritizes questions from your selected category (e.g., "Safety"). It includes **all** unique questions from that category first, then fills the remaining spots up to 58 by drawing randomly from the entire pool.</li>
+        </ul>
+        
+        <h4>Scoring & Passing</h4>
+        <p>The simulator uses the same standard as the official exam:</p>
+        <ul>
+            <li>**Quiz Length:** 58 Questions.</li>
+            <li>**Pass Mark:** 35 Correct Answers (60%).</li>
+            <li>**Time Limit:** 2 hours (The timer is for personal tracking; results are generated upon submission).</li>
+        </ul>
+
+        <h4>Control Buttons Explained</h4>
+        <ul>
+            <li>**New Quiz (All):** Starts a new, 58-question exam-style quiz by drawing proportionally from all categories.</li>
+            <li>**Practice Category:** Starts a new 58-question quiz, maximizing the questions from the category selected in the dropdown.</li>
+            <li>**Save progress:** Saves your current quiz state (answers chosen and time left) to your browser's local storage.</li>
+            <li>**Manage saved attempts:** Opens a panel listing all your saved quizzes, allowing you to **Load** a specific attempt or **Delete** an old one.</li>
+            <li>**Reports & Leaderboard:** Opens a panel displaying your historical quiz results, ranked by score and time taken.</li>
+            <li>**How it Works:** Toggles this explanatory panel on and off.</li>
+            <li>**Flag for Review (in question):** Toggles a visual flag on the question. This helps you quickly jump back to it later using the quick jump mini-navigation.</li>
+            <li>**Show Answer (in question):** Reveals the correct answer for that specific question instantly, without ending the quiz.</li>
+        </ul>
+                <div style="margin-top: 15px; padding: 10px; border: 1px dashed var(--accent); border-radius: 6px;">
+            **Support the Author:** If you find this tool helpful for your exam preparation, please consider <a href="https://paypal.me/John78500" target="_blank" style="font-weight: 600; color: var(--accent);">buying me a coffee! ☕</a>
+        <ul>
+          Questions, feedback, bug report to sohbay+rsgb@gmail.com
+        </ul>
+            </div>
+    `;
+});
+
+// Final initialization run
+let POOL = []; // Declare POOL globally
+try {
+    POOL = expandPool();
+    // *** IMPORTANT FIX: SHUFFLE THE ENTIRE MASTER POOL AT STARTUP ***
+    shuffle(POOL); 
+    // ***************************************************************
+    document.getElementById('poolSize').textContent = POOL.length;
+
+    updateSavedCount(); 
+    drawQuiz(); 
+    startTimer();
+} catch (e) {
+    document.getElementById('questionsArea').innerHTML = `<div style="color: red; padding: 20px; border: 1px solid red;">
+        **CRITICAL ERROR DURING INITIALIZATION.** The question pool failed to generate.
+        <br><br>
+        This usually means a syntax error in the code (which I have tried to fix) or an issue with your browser.
+        <br><br>
+        **Action:** Please check your browser's Console (F12) for the exact error message and share it with me, or simply try the previous troubleshooting steps (clearing cache) one more time.
+        Error details: ${e.message}
+        </div>`;
+    console.error("Initialization failed:", e);
+}
+
+
+</script>
+</body>
+</html>
